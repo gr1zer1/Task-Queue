@@ -68,3 +68,7 @@ class RedisBroker(BaseBroker):
         await self._send(encode_command("BRPOP","tasks","0"))
         return TaskMessage.from_json(decode_response(await self._recv()))[1]
     
+
+    def done():
+        pass
+    
