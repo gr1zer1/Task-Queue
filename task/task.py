@@ -59,3 +59,14 @@ class TaskMessage:
 
     def to_task(self) -> Task:
         pass
+
+    @classmethod
+    def from_task(cls,task:Task):
+        return TaskMessage(
+            id=str(task.id),
+            function_name = task.function.__name__,
+            args = task.args,
+            kwargs=task.kwargs,
+            result=task.result,
+            status=str(task.status)
+            )

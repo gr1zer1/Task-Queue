@@ -2,6 +2,9 @@ from .broker import BaseBroker
 import socket
 import asyncio
 from urllib.parse import urlparse
+from task import Task,TaskMessage
+
+from redis import encode_command,decode_response
 
 
 class RedisBroker(BaseBroker):
@@ -42,15 +45,26 @@ class RedisBroker(BaseBroker):
         except:
             raise Exception
         
-    async def send(self, data:bytes):
+    async def _send(self, data:bytes):
         await self._loop.sock_sendall(self._socket,data)
     
 
-    async def recv(self,n:int = 4096) -> bytes:
+    async def _recv(self,n:int = 4096) -> bytes:
         return await self._loop.sock_recv(self._socket,n)
     
     def close(self):
         self._socket.close()
         self._socket = None
 
+
+    async def put(self, task:Task):
+        task_message = TaskMessage.from_task(task)
+        json_str = task_message.to_json()
+        await self._send(encode_command("LPUSH","tasks",json_str))
+        return await self._recv()
+
+    
+    async def get(self) -> TaskMessage:
+        await self._send(encode_command("BRPOP","tasks","0"))
+        return TaskMessage.from_json(decode_response(await self._recv()))[1]
     
