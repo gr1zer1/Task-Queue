@@ -1,9 +1,10 @@
 from asyncio import Queue
 from task import Task
+from .broker import BaseBroker
 import uuid
 
 
-class MemoryBroker:
+class MemoryBroker(BaseBroker):
 
     def __init__(self):
         self.queue: Queue[Task] = Queue()

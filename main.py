@@ -3,6 +3,9 @@ from client import Client
 from worker import Worker
 from registry import func_registry,task
 import asyncio
+from redis import encode_command
+
+print(encode_command("SET","key","value"))
 
 
 event = asyncio.Event()
