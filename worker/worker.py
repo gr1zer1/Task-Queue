@@ -1,6 +1,8 @@
 from broker import MemoryBroker
 from registry import func_registry
-from task import TaskStatus
+from task import TaskStatus, Task
+import asyncio
+
 import inspect
 
 class Worker:
@@ -10,9 +12,19 @@ class Worker:
     
 
     async def run(self):
+        sem = asyncio.Semaphore(5)
         while True:
             task = await self.broker.get()
+            
+            asyncio.create_task(self._execute(task,sem))
+
+         
+    
+
+    async def _execute(self,task: Task, sem: asyncio.Semaphore):
+        async with sem:
             task.status = TaskStatus.RUNNING
+
             try:
                 if inspect.iscoroutinefunction(task.function):
 
@@ -25,7 +37,7 @@ class Worker:
             except Exception as e:
                 task.status = TaskStatus.FAILED
                 task.result = e
-
+            
             self.broker.done()
             task.event.set()
 

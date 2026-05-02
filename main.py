@@ -15,11 +15,18 @@ worker = Worker(broker,func_registry)
 async def add(a,b):
     return a+b
 
+
 async def main():
     worker_task = asyncio.create_task(worker.run())
-    res = await add.run(12, 12)
-    await res.event.wait()
-    print(res.result)
+    results = await asyncio.gather(
+        add.run(1, 2),
+        add.run(3, 4),
+        add.run(5, 6),
+
+    )
+    for res in results:
+        await res.event.wait()
+        print(res.result)
     worker_task.cancel()
 
 asyncio.run(main())
