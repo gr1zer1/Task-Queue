@@ -56,3 +56,6 @@ class TaskMessage:
         task = json.loads(data)
         return cls(**task)
 
+
+    def to_task(self) -> Task:
+        pass
