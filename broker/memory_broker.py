@@ -1,14 +1,18 @@
 from asyncio import Queue
 from task import Task
+import uuid
+
 
 class MemoryBroker:
 
     def __init__(self):
         self.queue: Queue[Task] = Queue()
+        self.tasks: dict[uuid.UUID,Task] = dict()
 
     
     async def put(self,task:Task):
         await self.queue.put(task)
+        self.tasks[task.id] = task
     
     async def get(self):
         return await self.queue.get()
