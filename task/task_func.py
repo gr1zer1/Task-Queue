@@ -1,0 +1,2 @@
+class TaskFunc:
+    pass
