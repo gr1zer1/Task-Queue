@@ -4,7 +4,7 @@ import asyncio
 from urllib.parse import urlparse
 
 
-class MemoryRedis(BaseBroker):
+class RedisBroker(BaseBroker):
 
     def __init__(self,url:str):
         self._socket: socket.socket | None = None
@@ -41,7 +41,16 @@ class MemoryRedis(BaseBroker):
             )
         except:
             raise Exception
+        
+    async def send(self, data:bytes):
+        await self._loop.sock_sendall(self._socket,data)
+    
 
-
+    async def recv(self,n:int = 4096) -> bytes:
+        return await self._loop.sock_recv(self._socket,n)
+    
+    def close(self):
+        self._socket.close()
+        self._socket = None
 
     
