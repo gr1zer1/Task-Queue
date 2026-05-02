@@ -1,5 +1,5 @@
 import uuid
-from typing import Any
+from typing import Any,Callable
 from enum import StrEnum
 from asyncio import Event
 
@@ -12,12 +12,12 @@ class TaskStatus(StrEnum):
 
 
 class Task:
-    def __init__(self, function_name:str, args, kwargs):
+    def __init__(self, function: Callable, args, kwargs):
         """
         status = pending(by default), running, done, failed
         """
         self.id: uuid.UUID = uuid.uuid4()
-        self.function_name = function_name
+        self.function = function
         self.args = args
         self.kwargs = kwargs
         self.result: None | Any = None 

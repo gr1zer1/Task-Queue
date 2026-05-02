@@ -1,7 +1,7 @@
 from broker import MemoryBroker
 from registry import func_registry
 from task import TaskStatus
-
+import inspect
 
 class Worker:
     def __init__(self, broker:MemoryBroker, registry:dict):
@@ -14,8 +14,11 @@ class Worker:
             task = await self.broker.get()
             task.status = TaskStatus.RUNNING
             try:
-                func = self.registry[task.function_name]
-                task.result = await func(*task.args,**task.kwargs)
+                if inspect.iscoroutinefunction(task.function):
+
+                    task.result = await task.function(*task.args,**task.kwargs)
+                else:
+                    task.result = task.function(*task.args,**task.kwargs)
 
                 task.status = TaskStatus.DONE
             

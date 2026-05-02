@@ -1,8 +1,11 @@
+from task import Task,TaskFunc
+from broker import MemoryBroker
+
+
 func_registry:dict = dict()
 
-
-def task(func):
-    func_registry[func.__name__] = func
-    async def wrapper(*args,**kwargs):
-        return await func(*args,**kwargs)
-    return wrapper
+def task(broker: MemoryBroker):
+    def decorator(func):
+        func_registry[func.__name__] = func
+        return TaskFunc(func=func, broker=broker)
+    return decorator
