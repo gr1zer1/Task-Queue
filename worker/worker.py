@@ -24,5 +24,7 @@ class Worker:
                 task.result = e
 
             self.broker.done()
+            task.event.set()
+
 
             

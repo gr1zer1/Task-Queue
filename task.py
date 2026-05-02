@@ -1,6 +1,8 @@
 import uuid
 from typing import Any
 from enum import StrEnum
+from asyncio import Event
+
 
 class TaskStatus(StrEnum):
     PENDING = "pending"
@@ -20,4 +22,6 @@ class Task:
         self.kwargs = kwargs
         self.result: None | Any = None 
         self.status: TaskStatus = TaskStatus.PENDING
+        self.event = Event()
+
 
