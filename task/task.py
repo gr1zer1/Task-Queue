@@ -5,6 +5,8 @@ from asyncio import Event
 import json
 from dataclasses import dataclass
 
+from registry import func_registry
+
 import dataclasses
 
 
@@ -29,20 +31,10 @@ class Task:
         self.event = Event()
 
 
-    def to_json(self) -> str:
-        return json.dumps({
-            "id": str(self.id),
-            "function": self.function.__name__,
-            "args": self.args,
-            "kwargs": self.kwargs,
-            "status": str(self.status),
-        })
-
 
 @dataclass
 class TaskMessage:
     id:str
-    function_name:str
     args:Any
     kwargs:Any
     result: None|Any
@@ -58,13 +50,18 @@ class TaskMessage:
 
 
     def to_task(self) -> Task:
-        pass
+        task = Task(func_registry[self.id],self.args,self.kwargs)
+
+        task.id = uuid.UUID(self.id)
+        task.result = self.result
+        task.status = self.status
+        return task
 
     @classmethod
     def from_task(cls,task:Task):
+        func_registry[str(task.id)] = task.function
         return TaskMessage(
             id=str(task.id),
-            function_name = task.function.__name__,
             args = task.args,
             kwargs=task.kwargs,
             result=task.result,

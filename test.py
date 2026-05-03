@@ -12,5 +12,4 @@ async def test():
     
     broker.close()
 
-
-print(str(test))
+test_str = str(test)

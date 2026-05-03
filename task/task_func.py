@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Callable,TYPE_CHECKING
 from . import Task
+from registry import func_registry
 
 
 if TYPE_CHECKING:
@@ -19,4 +20,12 @@ class TaskFunc:
         await self.broker.put(task)
         return task
     
-    
+
+
+
+
+def task(broker: MemoryBroker):
+    def decorator(func):
+        func_registry[func.__name__] = func
+        return TaskFunc(func=func, broker=broker)
+    return decorator

@@ -1,11 +1,5 @@
-from task import Task,TaskFunc
-from broker import MemoryBroker
+from typing import Callable
 
 
-func_registry:dict = dict()
+func_registry:dict[str,Callable] = dict()
 
-def task(broker: MemoryBroker):
-    def decorator(func):
-        func_registry[func.__name__] = func
-        return TaskFunc(func=func, broker=broker)
-    return decorator
