@@ -1,4 +1,4 @@
-from broker import MemoryBroker
+from broker import BaseBroker
 from registry import func_registry
 from task import TaskStatus, Task
 import asyncio
@@ -6,7 +6,7 @@ import asyncio
 import inspect
 
 class Worker:
-    def __init__(self, broker:MemoryBroker, registry:dict):
+    def __init__(self, broker:BaseBroker, registry:dict):
         self.broker = broker
         self.registry = registry
     

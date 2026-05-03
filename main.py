@@ -1,4 +1,4 @@
-from broker import MemoryBroker
+from broker import RedisBroker,MemoryBroker
 from client import Client
 from worker import Worker
 from registry import func_registry,task

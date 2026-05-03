@@ -63,14 +63,16 @@ class RedisBroker(BaseBroker):
         task_message = TaskMessage.from_task(task)
         json_str = task_message.to_json()
         await self._send(encode_command("LPUSH","tasks",json_str))
-        return await self._recv()
-
-    
-    async def get(self) -> TaskMessage:
-        await self._send(encode_command("BRPOP","tasks","0"))
+        
         await self._recv()
 
-        return TaskMessage.from_json(decode_response(await self._recv()))[1]
+        return task_message
+
+    
+    async def get(self) -> Task:
+        await self._send(encode_command("BRPOP","tasks","0"))
+
+        return TaskMessage.from_json(decode_response(await self._recv())[1]).to_task()
     
 
     def done():
