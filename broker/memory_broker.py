@@ -13,7 +13,7 @@ class MemoryBroker(BaseBroker):
     
     async def put(self,task:Task):
         await self.queue.put(task)
-        self.tasks[task.id] = task
+        self.tasks[str(task.id)] = task
     
     async def get(self):
         return await self.queue.get()

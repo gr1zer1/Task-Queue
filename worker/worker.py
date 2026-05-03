@@ -17,8 +17,10 @@ class Worker:
         sem = asyncio.Semaphore(5)
         while True:
             task = await self.broker.get()
-            
-            asyncio.create_task(self._execute(task,sem))
+            if type(self.broker) == RedisBroker:
+                await self._execute(task, sem)
+            else:
+                asyncio.create_task(self._execute(task, sem))
 
          
     
@@ -40,6 +42,7 @@ class Worker:
                 task.status = TaskStatus.FAILED
                 task.result = e
             
+            await self.broker.set_by_id(task)
             self.broker.done()
             task.event.set()
 
