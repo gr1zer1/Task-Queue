@@ -1,16 +1,16 @@
 from broker import RedisBroker,MemoryBroker
 from client import Client
 from worker import Worker
-from registry import func_registry,task
+from registry import func_registry
 import asyncio
 from redis import encode_command
+from task import task
 
-print(encode_command("SET","key","value"))
 
 
 event = asyncio.Event()
 
-broker = MemoryBroker()
+broker = RedisBroker("redis://localhost:6379")
 client = Client(broker)
 worker = Worker(broker,func_registry)
 
@@ -20,6 +20,8 @@ async def add(a,b):
 
 
 async def main():
+    await broker.connect()
+
     worker_task = asyncio.create_task(worker.run())
     results = await asyncio.gather(
         add.run(1, 2),

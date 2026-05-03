@@ -1,4 +1,4 @@
-from broker import BaseBroker
+from broker import BaseBroker,RedisBroker
 from registry import func_registry
 from task import TaskStatus, Task
 import asyncio
@@ -12,6 +12,8 @@ class Worker:
     
 
     async def run(self):
+        if type(self.broker) == RedisBroker:
+            await self.broker.connect()
         sem = asyncio.Semaphore(5)
         while True:
             task = await self.broker.get()

@@ -5,18 +5,18 @@ from registry import func_registry
 
 
 if TYPE_CHECKING:
-    from broker import MemoryBroker
+    from broker import BaseBroker
 
 class TaskFunc:
     
-    def __init__(self, func: Callable, broker: MemoryBroker):
+    def __init__(self, func: Callable, broker: BaseBroker):
         self.func: Callable = func
         self.broker = broker
     
 
     async def run(self,*args,**kwargs):
         task = Task(self.func,args,kwargs)
-        self.broker.tasks[task.id] = task
+        await self.broker.set_by_id(task)
         await self.broker.put(task)
         return task
     
@@ -24,7 +24,7 @@ class TaskFunc:
 
 
 
-def task(broker: MemoryBroker):
+def task(broker: BaseBroker):
     def decorator(func):
         func_registry[func.__name__] = func
         return TaskFunc(func=func, broker=broker)

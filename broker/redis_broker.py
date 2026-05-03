@@ -81,11 +81,16 @@ class RedisBroker(BaseBroker):
 
     async def get_by_id(self,id: UUID | str):
         await self._send(encode_command("GET",f"task:{str(id)}"))
-        task = await self._recv()
-        return decode_response(task)
+        res = await self._recv()
+        task_message = TaskMessage.from_json(decode_response(res))
 
-    async def set_by_id(self,task:TaskMessage):
-        task_json = task.to_json()
+        task = task_message.to_task()
+
+        return task
+
+
+    async def set_by_id(self,task:Task):
+        task_json = TaskMessage.from_task(task).to_json()
         await self._send(encode_command("SET",f"task:{str(task.id)}",task_json))
         await self._recv()
 

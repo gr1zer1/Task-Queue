@@ -8,7 +8,7 @@ class MemoryBroker(BaseBroker):
 
     def __init__(self):
         self.queue: Queue[Task] = Queue()
-        self.tasks: dict[uuid.UUID,Task] = dict()
+        self.tasks: dict[str,Task] = dict()
 
     
     async def put(self,task:Task):
@@ -20,3 +20,13 @@ class MemoryBroker(BaseBroker):
     
     def done(self):
         self.queue.task_done()
+
+    
+    async def set_by_id(self, task:Task):
+        self.tasks[str(task.id)] = task
+    
+
+    async def get_by_id(self, id:str | uuid.UUID):
+        task = self.tasks.get(str(id))
+        if task is None: raise Exception
+        else: return task
