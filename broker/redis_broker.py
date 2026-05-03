@@ -4,6 +4,8 @@ import asyncio
 from urllib.parse import urlparse
 from task import Task,TaskMessage
 
+from uuid import UUID
+
 from redis import encode_command,decode_response
 
 
@@ -66,9 +68,24 @@ class RedisBroker(BaseBroker):
     
     async def get(self) -> TaskMessage:
         await self._send(encode_command("BRPOP","tasks","0"))
+        await self._recv()
+
         return TaskMessage.from_json(decode_response(await self._recv()))[1]
     
 
     def done():
         pass
+
+
+    async def get_by_id(self,id: UUID | str):
+        await self._send(encode_command("GET",f"task:{str(id)}"))
+        task = await self._recv()
+        return decode_response(task)
+
+    async def set_by_id(self,task:TaskMessage):
+        task_json = task.to_json()
+        await self._send(encode_command("SET",f"task:{str(task.id)}",task_json))
+        await self._recv()
+
+        return task_json
     

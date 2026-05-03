@@ -12,4 +12,5 @@ async def test():
     
     broker.close()
 
-asyncio.run(test())
+
+print(str(test))
